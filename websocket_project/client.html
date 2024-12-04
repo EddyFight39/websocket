@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <button id="connectButton">Connect to Server</button>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button id="sendButton">Send Message</button>
+    <div id="output"></div>
+
+    <script>
+        let socket;
+        const connectButton = document.getElementById('connectButton');
+        const sendButton = document.getElementById('sendButton');
+        const messageInput = document.getElementById('messageInput');
+        const output = document.getElementById('output');
+
+        connectButton.addEventListener('click', () => {
+            socket = new WebSocket('ws://localhost:8080');
+
+            socket.onopen = () => {
+                output.innerHTML += '<p>Connected to server</p>';
+            };
+
+            socket.onmessage = (event) => {
+                output.innerHTML += `<p>Server: ${event.data}</p>`;
+            };
+
+            socket.onclose = () => {
+                output.innerHTML += '<p>Disconnected from server</p>';
+            };
+        });
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+                output.innerHTML += `<p>You: ${message}</p>`;
+            } else {
+                output.innerHTML += '<p>Cannot send message. Not connected to server.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
